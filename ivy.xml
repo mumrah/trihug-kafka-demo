@@ -1,0 +1,9 @@
+<ivy-module version="2.0">
+  <info organisation="demo" module="trihug-kafka-demo"/>
+  <configurations>
+    <conf name="default"/>
+  </configurations>
+  <dependencies>
+    <dependency org="org.apache.kafka" name="kafka_2.9.2" rev="0.8.0-beta1" conf="default->default"/>
+  </dependencies>
+</ivy-module>

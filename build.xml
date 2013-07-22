@@ -1,0 +1,51 @@
+<project name="trihug-kafka-demo" default="compile" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+  <description>Demo for TriHUG Kafka meetup</description>
+  <property name="src" location="src"/>
+  <property name="lib" location="lib"/>
+  <property name="build" location="build"/>
+  <property name="zk.port" value="2181"/>
+  <property name="zk.dir" value="/tmp/trihug-kafka-demo"/>
+
+  <path id="compile-libraries">
+    <fileset dir="lib" includes="*.jar"/>
+  </path>
+
+  <target name="compile" description="compile the source">
+    <mkdir dir="${build}"/>
+    <javac srcdir="${src}" destdir="${build}">
+      <classpath refid="compile-libraries"/>
+    </javac>
+  </target>
+
+  <target name="zk" description="run zookeeper">
+    <!-- If this fails, make sure 2181 is free and that /tmp/trihug-kafka-demo
+            can be created. You can also change the port by overwriting zk.port and zk.dir -->
+    <java classname="org.apache.zookeeper.server.ZooKeeperServerMain" 
+          dir="${basedir}" fork="true" failonerror="true">
+      <classpath refid="compile-libraries"/>
+      <jvmarg value="-Xmx512m"/>
+      <arg value="${zk.port}"/>
+      <arg value="${zk.dir}"/>
+    </java>
+  </target>
+
+  <target name="clean" description="clean up build directory">
+    <delete dir="${build}"/>
+  </target>
+
+  <target name="clean-zk" description="clean up ZooKeeper directory">
+    <delete dir="${zk.dir}"/>
+  </target>
+
+  <target name="ivy-init">
+    <path id="ivy.lib.path">
+      <fileset dir="." includes="ivy-2.3.0.jar"/>
+    </path>
+    <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+  </target>
+
+  <target name="ivy" depends="ivy-init" description="retrieve dependencies with ivy" unless="skip.ivy">
+    <ivy:resolve type="jar,bundle" log="download-only"/>
+    <ivy:retrieve type="jar,bundle" log="download-only" pattern="${lib}/[artifact]-[revision].[ext]" />
+  </target>
+</project>
